@@ -2,9 +2,10 @@
 extern crate criterion;
 
 use std::convert::TryFrom;
+use std::hint::black_box;
 
 use criterion::Criterion;
-use criterion::{black_box, BenchmarkId};
+use criterion::BenchmarkId;
 
 use j4rs::{self, Instance, InvocationArg, JavaOpt, Jvm, JvmBuilder, MavenArtifact};
 
