@@ -17,7 +17,7 @@ extern crate proc_macro2;
 use proc_macro::TokenStream;
 
 use proc_macro2::{Ident, Span};
-use syn::{parse_macro_input, Expr, FnArg, ItemFn, ReturnType, LitStr};
+use syn::{parse_macro_input, Expr, FnArg, ItemFn, LitStr, ReturnType};
 
 use quote::quote;
 
@@ -71,13 +71,10 @@ fn impl_call_from_java_macro(user_function: &ItemFn, macro_arg: LitStr) -> Token
         }
     };
     // The jni return value. This may be void or jobject
-    let return_value = match &user_function_signature.output {
-        ReturnType::Default => {
-            let ret_value: Expr = syn::parse_str("()").unwrap();
-            ret_value
-        }
-        _ => {
-            let ret_value: Expr = syn::parse_str(
+    let return_value: Option<Expr> = match &user_function_signature.output {
+        ReturnType::Default => None,
+        _ => Some(
+            syn::parse_str(
                 r#"match instance_to_return {
                     Ok(i) => {
                         i.java_object()
@@ -89,9 +86,9 @@ fn impl_call_from_java_macro(user_function: &ItemFn, macro_arg: LitStr) -> Token
                         ptr::null_mut()
                     },
                 }"#,
-            ).unwrap();
-            ret_value
-        }
+            )
+            .unwrap(),
+        ),
     };
 
     let instance_args_to_pass_to_user_function: Vec<Expr> = user_function_arg_names.iter()
@@ -101,7 +98,7 @@ fn impl_call_from_java_macro(user_function: &ItemFn, macro_arg: LitStr) -> Token
         })
         .collect();
 
-    let gen = quote! {
+    let generated = quote! {
         #[no_mangle]
         pub fn #jni_ident(jni_env: *mut JNIEnv, _class: *const c_void, #(#jni_function_args),*) #jni_function_output {
             match unsafe {Jvm::try_from(jni_env)} {
@@ -119,5 +116,5 @@ fn impl_call_from_java_macro(user_function: &ItemFn, macro_arg: LitStr) -> Token
             }
         }
     };
-    gen.into()
+    generated.into()
 }
