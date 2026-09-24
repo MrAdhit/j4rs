@@ -22,7 +22,8 @@ j4rs stands for __'Java for Rust'__ and allows effortless calls to Java code fro
   * [Simple Maven artifacts download and deployment.](#Using-Maven-artifacts)
 * **[Java -> Rust support](#Java-to-Rust-support) (Call Rust from Java).**
 * **[JavaFX support](#JavaFX-support) (including FXML support).**
-* **Tested on Linux, Windows and [Android](#j4rs-in-android).**
+* **Tested on Linux, Windows, Mac and [Android](#j4rs-in-android).**
+* **Minimum supported Java version: 11.**
 
 ## Instead of donating to the dev
 
@@ -797,11 +798,6 @@ let jvm_res = j4rs::JvmBuilder::new()
 ```
 
 ## FAQ
-
-### I get `java.lang.NoSuchMethodError: java.net.URLClassLoader.<init>(Ljava/lang/String;[Ljava/net/URL;Ljava/lang/ClassLoader;)V`
-
-`j4rs` uses a custom ClassLoader, that needs minimum Java version 9. In order to use the default classloader that supports
-older Java versions, invoke the `JvmBuilder::with_default_classloader` when building the `Jvm`.
 
 ### How can I enable debug logging?
 
